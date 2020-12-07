@@ -1,4 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qignit_music_player/Store_pages/Account.dart';
 import 'package:qignit_music_player/appbar3.dart';
 import 'package:qignit_music_player/utils/FadePageRoute.dart';
@@ -123,12 +127,28 @@ class _SinglecomponentState extends State<Singlecomponent> {
                                       child: startdownload
                                           ? Text("Downloading ")
                                           : Text("Buy Album   "),
-                                      onPressed: () => {
+                                      onPressed: () async {
                                         setState(() {
                                           startdownload = true;
                                           print(
                                               "the value of the button is $buttonispressed");
-                                        })
+                                        });
+                                        final status =
+                                            await Permission.storage.request();
+                                        if (status.isGranted) {
+                                          final externalDir =
+                                              await getExternalStorageDirectory();
+                                          final id =
+                                              await FlutterDownloader.enqueue(
+                                            url: null,
+                                            savedDir: externalDir.path,
+                                            fileName: "Qignit Album",
+                                            showNotification: true,
+                                            openFileFromNotification: true,
+                                          );
+                                        } else {
+                                          print('permission denied');
+                                        }
                                       },
                                     ))
                         ],
